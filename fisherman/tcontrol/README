@@ -1,0 +1,128 @@
+
+==
+If Client Then
+            hDCSrc = GetDC(hWndSrc) ' Get device context for client area.
+         Else
+            hDCSrc = GetWindowDC(hWndSrc) ' Get device context for entire
+                                          ' window.
+         End If
+
+         ' Create a memory device context for the copy process.
+         hDCMemory = CreateCompatibleDC(hDCSrc)
+         ' Create a bitmap and place it in the memory DC.
+         hBmp = CreateCompatibleBitmap(hDCSrc, WidthSrc, HeightSrc)
+         hBmpPrev = SelectObject(hDCMemory, hBmp)
+
+         ' Get screen properties.
+         RasterCapsScrn = GetDeviceCaps(hDCSrc, RASTERCAPS) ' Raster
+                                                            ' capabilities.
+         HasPaletteScrn = RasterCapsScrn And RC_PALETTE       ' Palette
+                                                              ' support.
+         PaletteSizeScrn = GetDeviceCaps(hDCSrc, SIZEPALETTE) ' Size of
+                                                              ' palette.
+
+         ' If the screen has a palette make a copy and realize it.
+         If HasPaletteScrn And (PaletteSizeScrn = 256) Then
+            ' Create a copy of the system palette.
+            LogPal.palVersion = &H300
+            LogPal.palNumEntries = 256
+            r = GetSystemPaletteEntries(hDCSrc, 0, 256, _
+                LogPal.palPalEntry(0))
+            hPal = CreatePalette(LogPal)
+            ' Select the new palette into the memory DC and realize it.
+            hPalPrev = SelectPalette(hDCMemory, hPal, 0)
+            r = RealizePalette(hDCMemory)
+         End If
+
+         ' Copy the on-screen image into the memory DC.
+         r = BitBlt(hDCMemory, 0, 0, WidthSrc, HeightSrc, hDCSrc, _
+            LeftSrc, TopSrc, vbSrcCopy)
+
+      ' Remove the new copy of the  on-screen image.
+         hBmp = SelectObject(hDCMemory, hBmpPrev)
+
+         ' If the screen has a palette get back the palette that was
+         ' selected in previously.
+         If HasPaletteScrn And (PaletteSizeScrn = 256) Then
+            hPal = SelectPalette(hDCMemory, hPalPrev, 0)
+         End If
+
+         ' Release the device context resources back to the system.
+         r = DeleteDC(hDCMemory)
+         r = ReleaseDC(hWndSrc, hDCSrc)
+
+         ' Call CreateBitmapPicture to create a picture object from the
+         ' bitmap and palette handles. Then return the resulting picture
+         ' object.
+         Set CaptureWindow = CreateBitmapPicture(hBmp, hPal)
+==
+
+hdcScreen = GetDC(WndSrc);
+hdcCompatible = CreateCompatibleDC(hdcScreen); 
+bmp = CreateCompatibleBitmap(hdcScreen, 
+                     GetDeviceCaps(hdcScreen, HORZRES), 
+                     GetDeviceCaps(hdcScreen, VERTRES)); 
+SelectObject(hdcCompatible, bmp);
+BitBlt(hdcCompatible, 0,0, bmp.bmWidth, bmp.bmHeight, hdcScreen, 0,0, SRCCOPY);
+
+// http://www.ucancode.net/Visual_C_MFC_Example/CreateDIBSection-BITMAPINFOHEADER-CreateCompatibleDC-BITMAPINFO.htm
+
+==
+BOOL BlendImages(HBITMAP hbmSrc1, HBITMAP hbmSrc2, HBITMAP hbmDst, DWORD dwWeight1)
+{
+    BITMAP bmSrc1, bmSrc2, bmDst;
+    RGBTRIPLE *lprgbSrc1, *lprgbSrc2, *lprgbDst;
+    DWORD dwWidthBytes, dwWeight2;
+    int x, y;
+    
+    // Only values between 0 and 255 are valid.
+    if (dwWeight1 > 255) return FALSE;
+    
+    // Get weighting value for second source image.
+    dwWeight2 = 255-dwWeight1;
+    
+    // Get information about the surfaces you were passed.
+    if (!GetObject(hbmSrc1, sizeof(BITMAP), &bmSrc1)) return FALSE;
+    if (!GetObject(hbmSrc2, sizeof(BITMAP), &bmSrc2)) return FALSE;
+    if (!GetObject(hbmDst,  sizeof(BITMAP), &bmDst))  return FALSE;
+
+    // Make sure you have data that meets your requirements.
+    if (!BitmapsCompatible(&bmSrc1, &bmSrc2))
+        return FALSE;
+    if (!BitmapsCompatible(&bmSrc1, &bmDst))
+        return FALSE;
+    if (bmSrc1.bmBitsPixel != 24)
+        return FALSE;
+    if (bmSrc1.bmPlanes != 1)
+        return FALSE;
+    if (!bmSrc1.bmBits || !bmSrc2.bmBits || !bmDst.bmBits)
+        return FALSE;
+
+    dwWidthBytes = bmDst.bmWidthBytes;
+    
+    // Initialize the surface pointers.
+    lprgbSrc1 = (RGBTRIPLE *)bmSrc1.bmBits; 
+    lprgbSrc2 = (RGBTRIPLE *)bmSrc2.bmBits;  
+    lprgbDst  = (RGBTRIPLE *)bmDst.bmBits;
+
+    for (y=0; y<bmDst.bmHeight; y++) {
+        for (x=0; x<bmDst.bmWidth; x++) {
+            lprgbDst[x].rgbtRed   = 
+              (BYTE)((((DWORD)lprgbSrc1[x].rgbtRed * dwWeight1) + 
+              ((DWORD)lprgbSrc2[x].rgbtRed * dwWeight2)) >> 8);
+            lprgbDst[x].rgbtGreen = 
+              (BYTE)((((DWORD)lprgbSrc1[x].rgbtGreen * dwWeight1) + 
+              ((DWORD)lprgbSrc2[x].rgbtGreen * dwWeight2)) >> 8);
+            lprgbDst[x].rgbtBlue  = 
+              (BYTE)((((DWORD)lprgbSrc1[x].rgbtBlue * dwWeight1) + 
+              ((DWORD)lprgbSrc2[x].rgbtBlue * dwWeight2)) >> 8);
+        }
+
+        // Move to next scan line.
+        lprgbSrc1 = (RGBTRIPLE *)((LPBYTE)lprgbSrc1 + dwWidthBytes);
+        lprgbSrc2 = (RGBTRIPLE *)((LPBYTE)lprgbSrc2 + dwWidthBytes);
+        lprgbDst  = (RGBTRIPLE *)((LPBYTE)lprgbDst  + dwWidthBytes);
+    }
+
+    return TRUE;
+}

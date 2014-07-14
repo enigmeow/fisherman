@@ -1,0 +1,35 @@
+2009-09-10  Josh Siegel <jsiegel@stormbirds.org>
+	* top-toons: Enigmeow at 11117 fish..
+	
+2009-09-04  Josh Siegel  <jsiegel@stormbirds.org>
+
+	* fish.hxx: Added complete description of all ponds
+	* top-toons: #1: Ebb oh knee(9868)/ #2: Enigmeow(9484)
+	
+2009-09-03  Josh Siegel  <jsiegel@stormbirds.org>
+
+	* README: sample code from internet for Bit blitting
+	* fisherman.cpp: Make binary persistance work.. yuck.  Lets make
+   	                 it a csv file!
+	* fisherman.cpp: Added alto ave docks 1 and 2 and lullaby lane 1
+	* fisherman.cpp: Remove some reverse casting poison
+	* fisherman.cpp: Try to remove some 'we will obviously miss' poison
+        * fisherman.cpp: Cleaned up all compilation warnings
+        * fisherman.cpp: Added UI callbacks for all pond configuration entries (to make them editable)
+        * fisherman.cpp: Selecting a toon now correctly updates visible GUI elements
+        * Top-toons: Enigmeow (9957)/#1 and Ebb Oh Knee (9842)/#2
+	* fisherman.cpp: Add basic load/save functionality for ponds
+	
+2009-09-02  Josh Siegel  <jsiegel@stormbirds.org>
+
+	* fsetup: created a installer and tested it
+        * Form1.h: reorganized the GUI to make it easier to edit ponds 
+	* fisherman.cpp: Added support for multiple ponds
+        * fisherman.cpp: Improved the state repair system to make it recover better when things go wrong
+        * fisherman.cpp: Corrected some timing issues which caused multiple casts, wasting jelly beans, without waiting for the lure to land
+        * Form1.h: Giving the fisherman focus will stop the fishing
+        * fisherman.cpp: The dock X/Y and fisher X/Y are now configurable
+
+2009-09-01  Josh Siegel  <jsiegel@stormbirds.org>
+
+	* version 0.001 : Became self hosting (fishing my own toons)

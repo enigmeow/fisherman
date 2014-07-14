@@ -1,0 +1,79 @@
+Section "InputDevice"
+        Identifier      "Generic Keyboard"
+        Driver          "kbd"
+        Option          "CoreKeyboard"
+        Option          "XkbRules"      "xorg"
+        Option          "XkbModel"      "pc105"
+        Option          "XkbLayout"     "us"
+        Option          "XkbOptions"    "lv3:ralt_switch, ctrl:nocaps"
+EndSection
+
+
+I tend to check in most of my configuration files to make it easier
+for me to track changes between various machines as well as set up a
+new machine
+
+New machine:
+  cd ~
+  ln -s ~/repos/torino/other/emacs/jsiegel/.cshrc .
+  ln -s ~/repos/torino/other/emacs/jsiegel/dotemacs .emacs
+  ln -s ~/repos/torino/other/emacs/jsiegel/.Xdefaults .
+  cp ~/repos/torino/other/emacs/jsiegel/id_dsa.pub .ssh/authorized_keys
+  cp ~/repos/torino/other/emacs/jsiegel/ssh_config .ssh/config
+
+yes, I checked in my id_dsa file..  :)
+
+%comspec% /k alias -f c:\cue-new.pri && "C:\Program Files\Microsoft Visual Studio 8\VC\vcvarsall.bat" x86
+
+        --josh
+
+--
+
+I know there is a "proper" way too but I am always too lame to finally
+read up on it --- involves ssh-agent and ssh-askpass when you open your
+x11 session. That way you get to have an ssh key _with_ a password but
+you only get asked once :)   I'd think that the Gnome and KDE
+environments we have already support this.
+
+That said, now for the poor man's hack job:
+
+1) on machine A:
+       $ ssh-keygen -t dsa             # default name, __no password__
+       $ cat ~/.ssh/id_dsa.pub | ssh jump@njw-spdl27 "cat >> ~/.ssh/authorized_keys;chmod go-w ~;chmod -R 600 ~/.ssh/*;chmod 700 ~/.ssh"
+
+------------------------------------
+OLD STEPS
+2) on machine B:
+       $ wget A:~/myKeyOnA.txt         # or ftp or whatever
+       $ cat myKeyOnA >> .ssh/authorized_keys
+
+3) on machine A
+       $ ssh B w
+   and you should be set.
+
+Double check file and directory modes:
+
+deddelbuettel@chijsiegel490:~$ ls -ld  .ssh/
+drwx------ 2 deddelbuettel UnixUsers 4096 2006-09-21 12:58 .ssh/
+deddelbuettel@chijsiegel490:~$ ls -l .ssh/
+total 16
+-rw------- 1 deddelbuettel UnixUsers 3996 2006-09-22 11:59 authorized_keys
+-rw------- 1 deddelbuettel UnixUsers 1192 2006-09-21 12:36 id_dsa
+-rw-r--r-- 1 deddelbuettel UnixUsers 1129 2006-09-21 12:36 id_dsa.pub
+-rw-r--r-- 1 deddelbuettel UnixUsers 1424 2006-09-21 12:59 known_hosts
+
+authorized_keys must be 0600, and ~/.ssh must be 0700.
+
+Also your home directory cannot be writtable by others
+
+% chmod go-w ~
+% chmod -R 600 ~/.ssh/*
+% chmod 700 ~/.ssh
+
+
+
+==
+
+getting rid of the fucking xauth error
+
+    xauth generate $DISPLAY .

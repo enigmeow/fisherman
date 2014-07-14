@@ -1,0 +1,1 @@
+rdesktop -x lan -E -g 2560x1024  jumpdev5

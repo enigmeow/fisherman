@@ -1,0 +1,2 @@
+#rdesktop -E -D -g 2560x1024 chijsiegel490xp
+rdesktop -rsound:off -E -g 2560x1024 chijsiegel490xp

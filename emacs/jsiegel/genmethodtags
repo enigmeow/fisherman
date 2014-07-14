@@ -1,0 +1,87 @@
+#!/local/bin/perl
+
+require "find.pl";
+
+sub wanted {
+    if (/^.*\.([ch]xx|cpp|cc|h|[ch]|bld|java|idl|odl|ini|y)$/) {
+	$files{$_} = $dir . "/" . $_;
+    }
+};
+
+while($dir = shift) {
+    &find($dir);
+};
+
+print "\n";
+
+$mapVar = 0;
+
+print "(setq vtmethodfiles (list\n";
+foreach $fname (keys %files) {
+    $ARG = $files{$fname};
+
+    $t = $ARG;
+    $t =~ s/\\/\\\\/g;
+
+    print "  (list \"" . $fname . "\" \"" . $t . "\")\n";
+
+    $fil = "(nth 1 (nth " . $mapVar . " vtmethodfiles))";
+    $mapVar = $mapVar + 1;
+
+    if ($ARG =~ /^.*\.([ch]xx|c|cc|h)$/) {  # cxx and hxx files
+	open(ARG, $ARG) || warn "Couldn't open $ARG";
+
+	while (<ARG>) {
+	    chop;
+
+            $_ =~ s///g;
+
+	    if (/^.*\\$/) {
+
+	    } else {
+		if (/^class\s+([A-Za-z0-9_]+)/) {
+#	    $defs{$1} = $fil . ' (regexp-quote "'. $_ . '")';
+		    $defs{$1} = $fil . '  "'. $_ . '"';
+#                    print "Found " . $defs{$1} . "\n";
+		} else {
+		    if(/^[A-Za-z0-9]+.*\s\**([A-Z][A-Za-z0-9_]*)::([A-Za-z0-9_]+)\s*\(/) {
+			$_ =~ s/\\/\\\\/g;
+			$_ =~ s/"/\\"/g;
+#	        $classes{$1} .= "\t\t" . '(list "' . $2 . '" ' . $fil . ' (regexp-quote "' . $_ . '"))' . "\n";
+			$classes{$1} .= "\t\t" . '(list "' . $2 . '" ' . $fil . ' "' . $_ . '")' . "\n";
+			$meths{$2} = '(list "' . $2 . '" "'. $_ .' ")' . "\n";
+#                        print "Found class " . $classes{$1} . " and method " . $meths{$2} . "\n";
+		    } else {
+			if(/^([A-Z][A-Za-z0-9_]*)::([A-Za-z0-9_]+)\s*\(/) {
+#		    $classes{$1} .= "\t\t" . '(list "' . $2 . '" ' . $fil . ' (regexp-quote "' . $_ . '"))' . "\n";
+			    $_ =~ s/\\/\\\\/g;
+			    $_ =~ s/"/\\"/g;
+			    $classes{$1} .= "\t\t" . '(list "' . $2 . '" ' . $fil . '  "' . $_ . '")' . "\n";
+			    $meths{$2} = '(list "' . $2 . '" "'. $_ .' ")' . "\n";
+#                        print "Found class " . $classes{$1} . " and method " . $meths{$2} . "\n";
+			}
+		    }
+		}
+	    }
+	    
+	}
+	close(ARG);
+    }
+}
+print "))\n";
+print "\n";
+
+print "(setq vtbit-o-list (list\n";
+foreach $class (keys %classes) {
+    if ($defs{$class} eq '') {
+	$defs{$class} = "nil nil";
+    }
+    print "  (list ", '"', $class, '" ' , $defs{$class}, "\n\t(list\n", $classes{$class}, "))\n\n";
+}
+print "  ))\n";
+
+print "(setq method-list (list\n";
+foreach $method (keys %meths) {
+    print "\t", $meths{$method};
+}
+print "  ))\n";

@@ -1,0 +1,5 @@
+(defconst myemacsdir "~/emacs")
+(setq load-path (append (list myemacsdir) load-path))
+(load "shared.el")
+(load "metas.el")
+(server-start)

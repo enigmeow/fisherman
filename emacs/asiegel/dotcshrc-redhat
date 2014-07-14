@@ -1,0 +1,56 @@
+if ( ! ${?ROOT} ) then
+
+setenv MERCURY $HOME/speed-20
+setenv ROOT $HOME/speed-20
+setenv THIRDPARTY $HOME/ThirdParty
+
+# Construct PATH environment variable
+setenv PATH ".:${ROOT}/bin"
+foreach i ( /usr/X11R6/bin /usr/tibco/tibrv/bin /usr/bin /usr/sbin /bin /sbin /usr/local/bin /usr/local/jump/bin /usr/local/jump/gcc/bin /usr/local/jump/bison/bin )
+  if ( -e $i ) then
+    setenv PATH "${i}:${PATH}"
+  endif
+end
+
+setenv MANPATH /usr/man
+foreach i ( /usr/share/man /usr/X11R6/man /usr/local/man  )
+  if ( -e $i ) then
+    setenv MANPATH "${i}:${MANPATH}"
+  endif
+end
+
+setenv EDITOR `which vi`
+setenv AlexSiegel 1
+
+endif
+
+setenv LD_LIBRARY_PATH "."
+foreach i ( ${THIRDPARTY}/llm/2.2/runtime_for_all_platforms/linux_x86/lib32 /usr/tibco/tibrv/lib /usr/local/jump/gcc/lib /usr/local/jump/mpfr/lib /usr/local/lib /usr/lib /lib )
+  if ( -e $i ) then
+    setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:${i}"
+  endif
+end
+
+limit core 0
+
+set history=100 notify showdots filec symlinks=ignore
+set autolist=beepnever listmax=50 correct=cmd autoexpand
+set fignore = ( .o .dvi .bbl .aux .log .blg .dlog .ps \~ .orig .elc .mak .vcp )
+set time = ( 2 "user=%U secs  system=%S secs  elapsed=%E secs  memory=%K Kb" )
+set shorthost = `hostname -s`
+if ( ${?prompt} ) then
+  set prompt = "%S${shorthost}%s %S%h%s %S%c2%s "
+endif
+
+if ( ${?TERM} ) then
+  if ( ${TERM} == "xterm" ) then
+    set prompt = "%{\033]0;${shorthost} %c2\007%}%S${shorthost}%s %S%h%s %S%c2%s "
+  endif
+endif
+
+if ( ${?DISPLAY} ) then
+  alias start 'xterm -title "$shell:t @ $shorthost" -e /bin/tcsh &'
+  foreach i ( chi-spdl1 chi-spdl2 chi-spdl3 chi-spdl4 chi-spdl5 chi-spdl6 chi-spdl7 njw-spd1 njw-spd2 njw-spdl4 njw-spdl5 njw-spdl6 njw-spdl7 njw-spdl8 njw-spdl9 njw-spdl10 njw-spdl11 njw-spdl12 njw-spdl13 njw-spdl14 njw-spdl15 njw-spdl16 njw-spdl17 njw-spdl18 njw-spdl19 njw-spdl20 njw-spdl21 njw-spdl22 njw-spdl24 njw-spdl25 njw-spdl26 njw-spdl27 njw-spdl28 njw-spdl29 njc-spd1 cer-spdl1 cer-spdl2 cer-spdl3 cer-spdl4 cer-spdl5 jumpdev3 jumpdev7 )
+    alias ${i} ssh -x -f ${i} xterm -display ${DISPLAY} -e /bin/tcsh
+  end
+endif

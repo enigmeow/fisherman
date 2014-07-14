@@ -1,0 +1,22 @@
+XTerm*font2:            8x13
+XTerm*font3:            9x15
+XTerm*font4:            10x20
+XTerm*saveLines:        3000
+XTerm*scrollBar:        true
+XTerm*reverseWrap:	true
+XTerm*waitForMap:	true
+XTerm*font:		9x15bold
+XTerm*background:	black
+XTerm*foreground:	white
+XTerm*pointerColor:	yellow
+XTerm*pointerColorBackground:	blue
+XTerm*cursorColor:	coral
+
+Emacs*geometry:         80x24+10+6
+Emacs*background:	black
+Emacs*foreground:	white
+Emacs*font:		10x20
+Emacs*pointerColor:	yellow
+Emacs*pointerColorBackground:	blue
+Emacs*cursorColor:	coral
+Emacs*paneFont:		9x15
