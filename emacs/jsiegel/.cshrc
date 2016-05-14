@@ -1,5 +1,5 @@
 #set cdpath=$STORMBIRDS/src
-setenv DISPLAY booger:0.0
+#setenv DISPLAY booger:0.0
 setenv HOSTNAME `hostname`
 
 set nonomatch 

@@ -9,8 +9,8 @@
 ;; enable visual feedback on selections
 (setq transient-mark-mode t)
 
-(defconst myemacsdir "/home/jsiegel/repos/emacs/jsiegel")
+(defconst myemacsdir "/home/jsiegel/fisherman/emacs/jsiegel")
 
-(setq load-path (append load-path (list "/home/jsiegel/repos/emacs/jsiegel" "//home/jsiegel/repos/emacs/asiegel")))
+(setq load-path (append load-path (list "/home/jsiegel/fisherman/emacs/jsiegel" "/home/jsiegel/fisherman/emacs/asiegel")))
 
 (load "josh-emacs")

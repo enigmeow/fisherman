@@ -163,8 +163,8 @@
   (set-face-foreground 'default "white" frame)
   (set-face-background 'default "black" frame)
 
-  (set-face-foreground 'modeline "white" frame)
-  (set-face-background 'modeline "blue" frame)
+;  (set-face-foreground 'modeline "white" frame)
+;  (set-face-background 'modeline "blue" frame)
 
   (set-face-foreground 'region "white" frame)
   (set-face-background 'region "brown" frame)
